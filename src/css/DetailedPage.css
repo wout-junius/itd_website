@@ -1,0 +1,13 @@
+.DetailedPage {
+    min-height: 280px;
+    padding: 24px;
+    background: #fff;
+    width:85%
+  }
+
+.background {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
