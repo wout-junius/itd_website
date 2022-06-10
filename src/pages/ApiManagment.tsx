@@ -1,7 +1,7 @@
 import { Button, Form, Input, Modal, notification } from "antd";
 import React from "react";
 import { KeyOutlined } from "@ant-design/icons";
-import ApiKeyTable from "../components/ApiKeyTable";
+import ApiKeyTable from "../components/ApiManagment/ApiKeyTable";
 import { ApiKey } from "../Entities/api-key.entity";
 
 export default function ApiManagment() {

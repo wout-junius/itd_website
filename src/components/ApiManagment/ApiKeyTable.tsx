@@ -4,7 +4,7 @@ import Column from "antd/lib/table/Column";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import React, { CSSProperties } from "react";
 import ApiKeyShowcase from "./ApiKeyShowcase";
-import { ApiKey } from "../Entities/api-key.entity";
+import { ApiKey } from "../../Entities/api-key.entity";
 
 export default function ApiKeyTable(props: ApiKeyTableProps) {
   const { dataSource, footer, onDelete, onEdit } = props;

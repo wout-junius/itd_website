@@ -1,5 +1,5 @@
 import React from "react";
-import { MotorCoach } from "../Entities/motor-coach.entity";
+import { MotorCoach } from "../../Entities/motor-coach.entity";
 
 export default function MotorCoachStats(props: MCoachProps) {
   const { motorCoach } = props;

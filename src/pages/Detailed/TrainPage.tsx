@@ -4,14 +4,14 @@ import { Carousel, Image } from "antd";
 import "./../../css/DetailedPage.css";
 import { Locomotive } from "../../Entities/locomotive.entity";
 import { PowerSource } from "../../Entities/Enums";
-import LocomotiveStats from "../../components/LocomotiveStats";
+import LocomotiveStats from "../../components/stats/LocomotiveStats";
 import { Wagon } from "../../Entities/wagon.entity";
 import { MotorCoach } from "../../Entities/motor-coach.entity";
-import WagonStats from "../../components/WagonStats";
-import MotorCoachStats from "../../components/MotorCoachStats";
+import WagonStats from "../../components/stats/WagonStats";
+import MotorCoachStats from "../../components/stats/MotorCoachStats";
 
 export default function TrainPage() {
-  const { id } = useParams();
+  // const { id } = useParams();
   const { type } = useParams();
   const navigate = useNavigate();
   const [entity, setEntity] = React.useState<Locomotive | Wagon | MotorCoach>(

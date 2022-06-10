@@ -1,5 +1,5 @@
 import React from 'react'
-import { Locomotive } from '../Entities/locomotive.entity'
+import { Locomotive } from '../../Entities/locomotive.entity'
 
 export default function LocomotiveStats(props: LocProps) {
     const { locomotive } = props

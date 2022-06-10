@@ -1,5 +1,5 @@
 import React from "react";
-import { Wagon } from "../Entities/wagon.entity";
+import { Wagon } from "../../Entities/wagon.entity";
 
 export default function WagonStats(props: WagonProps) {
   const { wagon } = props;
