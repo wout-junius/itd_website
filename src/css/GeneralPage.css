@@ -1,4 +1,4 @@
-.DetailedPage {
+.content {
     min-height: 280px;
     padding: 24px;
     background: #fff;
@@ -12,5 +12,3 @@
     justify-content: center;
     align-items: center;
 }
-
-
