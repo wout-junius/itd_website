@@ -7,7 +7,6 @@ import {
 import { UserOutlined, SettingOutlined, ApiOutlined } from "@ant-design/icons";
 
 import About from "./pages/About";
-import Contact from "./pages/Contact";
 import Home from "./pages/Home";
 import SearchPage from "./pages/Search";
 
@@ -15,13 +14,14 @@ import "./App.css";
 import "antd/dist/antd.min.css";
 import NotFound from "./pages/NotFound";
 
-import { Layout, Menu, Input, Dropdown } from "antd";
+import { Layout, Menu, Input, Dropdown, Button } from "antd";
 
 import Manufacturer from "./pages/Detailed/Manufacturer";
-import MotorCoach from "./pages/Detailed/MotorCoach";
 import Operator from "./pages/Detailed/Operator";
-import Wagon from "./pages/Detailed/Wagon";
-import Locomotive from "./pages/Detailed/Locomotive";
+import TrainPage from "./pages/Detailed/TrainPage";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import ApiManagment from "./pages/ApiManagment";
 
 const { Header, Content, Footer } = Layout;
 const { Search } = Input;
@@ -48,7 +48,7 @@ function App() {
           }}
         />
         <Dropdown overlay={menu}>
-          <a onClick={(e) => e.preventDefault()}>
+          <Button type="link" onClick={(e) => e.preventDefault()}>
             <UserOutlined
               style={{
                 fontSize: "1.5em",
@@ -56,7 +56,7 @@ function App() {
                 color: "#fff",
               }}
             />
-          </a>
+          </Button>
         </Dropdown>
       </Header>
       <Content
@@ -67,14 +67,18 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
-          <Route path="/contact" element={<Contact />} />
+
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+
+          <Route path="/api/management" element={<ApiManagment />} />
+
+
           <Route path="/search/:query" element={<SearchPage />} />
 
-          <Route path="/locomotive/:id" element={<Locomotive />} />
-          <Route path="/Manufacturer/:id" element={<Manufacturer />} />
-          <Route path="/MotorCoach/:id" element={<MotorCoach />} />
-          <Route path="/Operator/:id" element={<Operator />} />
-          <Route path="/Wagon/:id" element={<Wagon />} />
+          <Route path="/:type/:id" element={<TrainPage />} />
+          <Route path="/manufacturer/:id" element={<Manufacturer />} />
+          <Route path="/operator/:id" element={<Operator />} />
 
           <Route path="*" element={<NotFound />} />
         </Routes>
