@@ -1,5 +1,5 @@
-import React, { useContext, useEffect, useState } from "react";
-import { Routes, Route, useNavigate, Link, NavLink } from "react-router-dom";
+import React, { useContext } from "react";
+import { Routes, Route, useNavigate, NavLink } from "react-router-dom";
 import { UserOutlined, SettingOutlined, ApiOutlined } from "@ant-design/icons";
 
 import About from "./pages/About";
@@ -27,9 +27,6 @@ const { Search } = Input;
 function App() {
   const navigate = useNavigate();
   const ctx = useContext(AuthContext);
-
-  const [menuItems, setMenuItems] = useState(items);
-
   const menuPressed = (item: any) => {
     if (item.key === "Logout") {
       ctx.logout();
@@ -58,7 +55,7 @@ function App() {
           }}
         />
         {ctx.user ? (
-          <Dropdown overlay={<Menu onClick={menuPressed} items={menuItems} />}>
+          <Dropdown overlay={<Menu onClick={menuPressed} items={items} />}>
             <Button type="link" onClick={(e) => e.preventDefault()}>
               <UserOutlined
                 style={{
@@ -82,11 +79,24 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
 
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route element={<ProtectedRoute user={ctx.user} redirectPath={"/login"} />}>
-            {<Route path="/api/management" element={<ApiManagment />} />}
-          </Route>
+          <Route
+            path="/login"
+            element={<ProtectedRoute isAuth={!ctx.user} element={<Login />} redirect="/" />}
+          />
+
+          <Route
+            path="/register"
+            element={
+              <ProtectedRoute isAuth={!ctx.user} element={<Register />}  redirect="/"/>
+            }
+          />
+
+          <Route
+            path="/api/management"
+            element={
+              <ProtectedRoute isAuth={!!ctx.user} element={<ApiManagment />} />
+            }
+          />
           <Route path="/search/:query" element={<SearchPage />} />
 
           <Route path="/:type/:id" element={<TrainPage />} />

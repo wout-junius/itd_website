@@ -1,16 +1,30 @@
 import { Button, Form, Input, Modal, notification } from "antd";
-import React from "react";
+import React, { useContext, useEffect } from "react";
 import { KeyOutlined } from "@ant-design/icons";
 import ApiKeyTable from "../components/ApiManagment/ApiKeyTable";
 import { ApiKey } from "../Entities/api-key.entity";
+import { useQuery, useMutation } from "@apollo/client";
+import {
+  CREATE_API_KEY,
+  DELETE_API_KEY,
+  GET_USER_KEYS,
+  UPDATE_API_KEY,
+} from "../Graphql/ApiKeyQueries";
+import { AuthContext } from "../context/AuthContext";
 
 export default function ApiManagment() {
   const [isModalVisible, setIsModalVisible] = React.useState(false);
-  const [dataSource, setDataSource] = React.useState<ApiKey[]>(temp);
+  const [dataSource, setDataSource] = React.useState<ApiKey[]>();
   const [isCreate, setIsCreate] = React.useState<boolean>(true);
   const [selectedKey, setSelectedKey] = React.useState<string>("");
   const [form] = Form.useForm();
-
+  const { loading, error, data } = useQuery(GET_USER_KEYS);
+  const ctx = useContext(AuthContext);
+  useEffect(() => {
+    if (data && !dataSource) {
+      setDataSource(data.apiKey);
+    }
+  });
   const showModal = () => {
     setIsModalVisible(true);
   };
@@ -44,53 +58,102 @@ export default function ApiManagment() {
   };
 
   const deleteKey = (key: string) => {
-    setDataSource(dataSource.filter((item) => item.key !== key));
+    deleteKeyMutation({ variables: { id: key } });
+    setDataSource(dataSource!.filter((item) => item.key !== key));
   };
 
-  const createKey = (event: any) => {
-    const typedEvent = event as { keyName: string }
-    const key: ApiKey = {
-      key: uuid(),
-      name: typedEvent.keyName,
-      usage: 0,
-      active: false,
-    };
+  const [deleteKeyMutation] = useMutation(DELETE_API_KEY, {
+    onCompleted: () => {
+      notification.success({
+        message: "Success",
+        description: "Key deleted successfully",
+      });
+    },
+  });
 
-    setDataSource([...dataSource, key]);
+  const createKey = (event: any) => {
+    const typedEvent = event as { keyName: string };
     setIsModalVisible(false);
+    if (ctx.user) {
+      const logedUser = ctx.user as any;
+      console.log(logedUser);
+      createKeyMutation({
+        variables: {
+          createApikeyInput: {
+            name: typedEvent.keyName,
+            user_id: logedUser.sub,
+          },
+        },
+      });
+    }
+  };
+
+  const [createKeyMutation] = useMutation(CREATE_API_KEY, {
+    onCompleted: (data) => {
+      if (dataSource) {
+        console.log(data.createApiKey);
+
+        setDataSource([...dataSource, data.createApiKey]);
+      } else {
+        setDataSource([data.createApiKey.key]);
+      }
+      notification.success({
+        message: "Success",
+        description: "Key created successfully",
+      });
+    },
+  });
+
+  const updateKey = (values: any) => {
+    const typedValues = values as { keyName: string };
+
     form.resetFields();
-    notification["success"]({
-      message: 'Successfully created new key whit name: ' + typedEvent.keyName,
+    updateKeyMutation({
+      variables: {
+        updateApiKeyInput: {
+          key: selectedKey,
+          name: typedValues.keyName,
+        },
+      },
     });
   };
 
-  const updateKey = (values: any) => {
-    const typedValues = values as { keyName: string }
-    dataSource.find((item) => item.key === selectedKey)!.name = typedValues.keyName;
-    setDataSource(dataSource);
-    setIsModalVisible(false);
-    setSelectedKey("");
-    form.resetFields();
-  };
+  const [updateKeyMutation] = useMutation(UPDATE_API_KEY, {
+    onCompleted: (data) => {      
+      let tempData = dataSource;
+      // console.log(tempData);
+      // console.log(selectedKey);
+      // console.log(data.updateApiKey);
+      // tempData!.find((item) => item.key === selectedKey)!.name = data.updateApiKey.name
+      setDataSource(tempData);
+      setIsModalVisible(false);
+      setSelectedKey("");
+      notification.success({
+        message: "Success",
+        description: "Key created successfully",
+      });
+    },
+  });
 
-  
   return (
     <>
       <div className="background">
         <div className="content">
+          <p>{error?.message}</p>
           <ApiKeyTable
             dataSource={dataSource}
             footer={footer}
             onDelete={deleteKey}
             onEdit={(key: string) => {
               setIsCreate(false);
-              form.resetFields();              
+              form.resetFields();
               form.setFieldsValue({
-                keyName: dataSource.find((item) => item.key === key)!.name,
+                keyName: dataSource?.find((item) => item.key === key)!.name,
               });
               setSelectedKey(key);
               showModal();
             }}
+            loading={loading}
           />
         </div>
       </div>
@@ -104,7 +167,12 @@ export default function ApiManagment() {
           </Button>,
         ]}
       >
-        <Form id="createKey" onFinish={isCreate ? createKey : updateKey} requiredMark form={form}>
+        <Form
+          id="createKey"
+          onFinish={isCreate ? createKey : updateKey}
+          requiredMark
+          form={form}
+        >
           <Form.Item
             name="keyName"
             label="Key name"
@@ -121,56 +189,3 @@ export default function ApiManagment() {
     </>
   );
 }
-
-const temp: ApiKey[] = [
-  {
-    key: "c0ea4037-01c6-40af-a76f-1bd949542c6d",
-    name: "Android app",
-    active: true,
-    usage: 403,
-  },
-  {
-    key: "414f7032-5b4e-420f-a73c-0d72ebb36fd3",
-    name: "web app",
-    active: true,
-    usage: 10300,
-  },
-  {
-    key: "8b45c0b0-f683-4562-aee7-052067990fc5",
-    name: "desktop app",
-    active: false,
-    usage: 200,
-  },
-  {
-    key: "137d3e36-9513-46e6-9497-2d4c9577be13",
-    name: "desktop app",
-    active: false,
-    usage: 200,
-  },
-  {
-    key: "16b931d6-239a-487a-8dfd-1e83275e29f9",
-    name: "desktop app",
-    active: false,
-    usage: 200,
-  },
-  {
-    key: "750ae609-593e-4dce-88d1-a5a227c8cbba",
-    name: "desktop app",
-    active: false,
-    usage: 200,
-  },
-  {
-    key: "eb6a810b-9c76-4458-b818-de8bfb4144bc",
-    name: "desktop app",
-    active: false,
-    usage: 200,
-  },
-];
-
-//Temp
-const uuid = () =>
-  "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
-    var r = (Math.random() * 16) | 0,
-      v = c === "x" ? r : (r & 0x3) | 0x8;
-    return v.toString(16);
-  });

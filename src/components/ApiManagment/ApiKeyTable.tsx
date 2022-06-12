@@ -18,6 +18,7 @@ export default function ApiKeyTable(props: ApiKeyTableProps) {
         position: ["bottomCenter"],
       }}
       footer={footer}
+      loading={props.loading}
     >
       <Column title="Name" dataIndex="name" key="name" />
       <Column title="Usage" dataIndex="usage" key="usage" />
@@ -75,10 +76,11 @@ export default function ApiKeyTable(props: ApiKeyTableProps) {
 }
 
 interface ApiKeyTableProps {
-  dataSource: ApiKey[];
+  dataSource?: ApiKey[];
   footer: any;
   onDelete: (id: string) => void;
   onEdit: (id: string) => void;
+  loading: boolean;
 }
 
 const buttonStyle: CSSProperties = {

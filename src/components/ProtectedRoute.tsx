@@ -1,15 +1,13 @@
-import { Navigate, Outlet, useNavigate } from "react-router-dom";
+import { Navigate } from "react-router-dom";
+import React from "react";
 
-import React, { ReactElement } from "react";
-import PropTypes from "prop-types";
+interface ProtectedRouteProps {
+  isAuth: boolean,
+  element: JSX.Element,
+  redirect?: string
+}
 
-const ProtectedRoute = (
-  props: React.PropsWithChildren<{ user: any; redirectPath: string }>
-): ReactElement<any, any> => {
-  if (!props.user || new Date(props.user.exp) < new Date()) {
-    console.log(props.redirectPath);
-    return <Navigate to={props.redirectPath} replace />;
-  }
-  return props.children as ReactElement<any, any>;
+const ProtectedRoute = ({ isAuth, element, redirect = "/login" } : ProtectedRouteProps) => {
+  return isAuth ? element : <Navigate to={redirect} />;
 };
 export default ProtectedRoute;
