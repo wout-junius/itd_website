@@ -1,9 +1,5 @@
-import React from "react";
-import {
-  Routes,
-  Route,
-  useNavigate,
-} from "react-router-dom";
+import React, { useContext, useEffect, useState } from "react";
+import { Routes, Route, useNavigate, Link, NavLink } from "react-router-dom";
 import { UserOutlined, SettingOutlined, ApiOutlined } from "@ant-design/icons";
 
 import About from "./pages/About";
@@ -22,12 +18,26 @@ import TrainPage from "./pages/Detailed/TrainPage";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ApiManagment from "./pages/ApiManagment";
+import { AuthContext } from "./context/AuthContext";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 const { Header, Content, Footer } = Layout;
 const { Search } = Input;
 
 function App() {
   const navigate = useNavigate();
+  const ctx = useContext(AuthContext);
+
+  const [menuItems, setMenuItems] = useState(items);
+
+  const menuPressed = (item: any) => {
+    if (item.key === "Logout") {
+      ctx.logout();
+      navigate("/");
+    } else {
+      navigate(item.key);
+    }
+  };
   return (
     <Layout className="layout">
       <Header
@@ -47,17 +57,21 @@ function App() {
             navigate("/search/" + data, { replace: true });
           }}
         />
-        <Dropdown overlay={menu}>
-          <Button type="link" onClick={(e) => e.preventDefault()}>
-            <UserOutlined
-              style={{
-                fontSize: "1.5em",
-                marginRight: "0.5em",
-                color: "#fff",
-              }}
-            />
-          </Button>
-        </Dropdown>
+        {ctx.user ? (
+          <Dropdown overlay={<Menu onClick={menuPressed} items={menuItems} />}>
+            <Button type="link" onClick={(e) => e.preventDefault()}>
+              <UserOutlined
+                style={{
+                  fontSize: "1.5em",
+                  marginRight: "0.5em",
+                  color: "#fff",
+                }}
+              />
+            </Button>
+          </Dropdown>
+        ) : (
+          loginMenu
+        )}
       </Header>
       <Content
         style={{
@@ -70,10 +84,9 @@ function App() {
 
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-
-          <Route path="/api/management" element={<ApiManagment />} />
-
-
+          <Route element={<ProtectedRoute user={ctx.user} redirectPath={"/login"} />}>
+            {<Route path="/api/management" element={<ApiManagment />} />}
+          </Route>
           <Route path="/search/:query" element={<SearchPage />} />
 
           <Route path="/:type/:id" element={<TrainPage />} />
@@ -94,26 +107,43 @@ function App() {
   );
 }
 
-const menu = (
-  <Menu
-    items={[
-      {
-        label: "API management",
-        key: "1",
-        icon: <ApiOutlined />,
-      },
-      {
-        label: "Settings",
-        key: "2",
-        icon: <SettingOutlined />,
-      },
-      {
-        label: "Account",
-        key: "3",
-        icon: <UserOutlined />,
-      },
-    ]}
-  />
+const items = [
+  {
+    label: "API management",
+    key: "/api/management",
+    icon: <ApiOutlined />,
+  },
+  {
+    label: "Settings",
+    key: "/settings",
+    icon: <SettingOutlined />,
+  },
+  {
+    label: "Account",
+    key: "/account",
+    icon: <UserOutlined />,
+  },
+  {
+    label: "Logout",
+    key: "Logout",
+    icon: <ApiOutlined />,
+  },
+];
+
+const loginMenu = (
+  <div>
+    <NavLink
+      to="/login"
+      style={{
+        marginRight: "0.5em",
+      }}
+    >
+      <Button type="primary">Login</Button>
+    </NavLink>
+    <NavLink to="/register">
+      <Button type="primary">Register</Button>
+    </NavLink>
+  </div>
 );
 
 export default App;

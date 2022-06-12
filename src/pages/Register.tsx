@@ -1,11 +1,42 @@
-import React from "react";
+import React, { useContext, useState } from "react";
 import PropTypes from "prop-types";
-import { Form, Input, Button } from "antd";
+import { Form, Input, Button, Alert } from "antd";
 import { UserOutlined, LockOutlined, MailOutlined } from "@ant-design/icons";
 import "./../css/GeneralPage.css";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import { useMutation } from "@apollo/client";
+import { REGISTER_USER } from "../Graphql/AuthQueries";
+import { AuthContext } from "../context/AuthContext";
 
 function Register() {
+  const context = useContext(AuthContext);
+  const navigate = useNavigate();
+  let formValue: any = {};
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const onFinish = (values: any) => {
+    registerUser({
+      variables: {
+        createUserInput: {
+          username: values?.username,
+          password: values?.password,
+          email: values?.email,
+        },
+      },
+    });
+    console.log(formValue, values);
+  };
+
+  const [registerUser, { loading }] = useMutation(REGISTER_USER, {
+    onCompleted: (data) => {
+      context.login(data.registerUser.access_token);
+      navigate("/");
+    },
+    onError: (error) => {
+      setErrorMessage(error.message);
+    },
+  });
+
   return (
     <div className="background">
       <div
@@ -18,7 +49,12 @@ function Register() {
       >
         <div>
           <h1>Register</h1>
-          <Form name="register" initialValues={{ remember: true }}>
+          {error(errorMessage)}
+          <Form
+            name="register"
+            initialValues={{ remember: true }}
+            onFinish={onFinish}
+          >
             <Form.Item
               name="username"
               rules={[
@@ -32,7 +68,10 @@ function Register() {
             </Form.Item>
             <Form.Item
               name="email"
-              rules={[{ required: true, message: "Please input your email!" }]}
+              rules={[
+                { required: true, message: "Please input your email!" },
+                { type: "email", message: "Please input a valid email!" },
+              ]}
             >
               <Input
                 prefix={<MailOutlined className="site-form-item-icon" />}
@@ -55,7 +94,21 @@ function Register() {
 
             <Form.Item
               name="passwordRepeat"
-              rules={[{ required: true, message: "Repeat your password!" }]}
+              rules={[
+                { required: true, message: "Repeat your password!" },
+                ({ getFieldValue }) => ({
+                  validator(_, value) {
+                    if (!value || getFieldValue("password") === value) {
+                      return Promise.resolve();
+                    }
+                    return Promise.reject(
+                      new Error(
+                        "The two passwords that you entered do not match!"
+                      )
+                    );
+                  },
+                }),
+              ]}
             >
               <Input
                 prefix={<LockOutlined className="site-form-item-icon" />}
@@ -83,5 +136,20 @@ function Register() {
     </div>
   );
 }
+
+const error = (error: string | undefined) => {
+  if (error) {
+    return (
+      <Alert
+        message={error}
+        type="error"
+        showIcon
+        style={{
+          marginBottom: "1em",
+        }}
+      />
+    );
+  }
+};
 
 export default Register;
