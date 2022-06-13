@@ -1,5 +1,5 @@
 import { Button, Form, Input, Modal, notification } from "antd";
-import React, { useContext, useEffect } from "react";
+import React, { useContext } from "react";
 import { KeyOutlined } from "@ant-design/icons";
 import ApiKeyTable from "../components/ApiManagment/ApiKeyTable";
 import { ApiKey } from "../Entities/api-key.entity";
@@ -20,11 +20,7 @@ export default function ApiManagment() {
   const [form] = Form.useForm();
   const { loading, error, data } = useQuery(GET_USER_KEYS);
   const ctx = useContext(AuthContext);
-  useEffect(() => {
-    if (data && !dataSource) {
-      setDataSource(data.apiKey);
-    }
-  });
+  if(data && !dataSource) setDataSource(data.apiKey);
   const showModal = () => {
     setIsModalVisible(true);
   };

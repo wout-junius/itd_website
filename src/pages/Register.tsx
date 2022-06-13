@@ -1,5 +1,4 @@
 import React, { useContext, useState } from "react";
-import PropTypes from "prop-types";
 import { Form, Input, Button, Alert } from "antd";
 import { UserOutlined, LockOutlined, MailOutlined } from "@ant-design/icons";
 import "./../css/GeneralPage.css";
@@ -27,7 +26,7 @@ function Register() {
     console.log(formValue, values);
   };
 
-  const [registerUser, { loading }] = useMutation(REGISTER_USER, {
+  const [registerUser] = useMutation(REGISTER_USER, {
     onCompleted: (data) => {
       context.login(data.registerUser.access_token);
       navigate("/");

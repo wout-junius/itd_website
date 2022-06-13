@@ -16,7 +16,7 @@ export default function LocomotiveStats(props: LocProps) {
             <td>
               <b>build year: </b>
             </td>
-            <td>{locomotive.buildYear.getFullYear()} </td>
+            <td>{new Date(locomotive.buildYear).getFullYear()} </td>
           </tr>
           <tr>
             <td>

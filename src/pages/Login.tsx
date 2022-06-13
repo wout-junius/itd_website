@@ -6,7 +6,6 @@ import { useMutation } from "@apollo/client";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { LOGIN_USER } from "../Graphql/AuthQueries";
-import { Alert } from "antd";
 
 export default function Login() {
   const context = useContext(AuthContext);
@@ -24,7 +23,7 @@ export default function Login() {
     });
   };
 
-  const [loginUser, { loading }] = useMutation(LOGIN_USER, {
+  const [loginUser] = useMutation(LOGIN_USER, {
     onCompleted: (data) => {
       context.login(data.login.access_token);
       navigate("/");

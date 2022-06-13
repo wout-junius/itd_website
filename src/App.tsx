@@ -1,6 +1,5 @@
 import React, { useContext } from "react";
-import { Routes, Route, useNavigate, NavLink } from "react-router-dom";
-import { UserOutlined, SettingOutlined, ApiOutlined } from "@ant-design/icons";
+import { Routes, Route } from "react-router-dom";
 
 import About from "./pages/About";
 import Home from "./pages/Home";
@@ -10,66 +9,27 @@ import "./App.css";
 import "antd/dist/antd.min.css";
 import NotFound from "./pages/NotFound";
 
-import { Layout, Menu, Input, Dropdown, Button } from "antd";
+import { Layout } from "antd";
 
 import Manufacturer from "./pages/Detailed/Manufacturer";
 import Operator from "./pages/Detailed/Operator";
-import TrainPage from "./pages/Detailed/TrainPage";
+import LocomotivePage from "./pages/Detailed/LocomotivePage";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ApiManagment from "./pages/ApiManagment";
 import { AuthContext } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
+import NavBar from "./components/NavBar";
+import MotorCoachPage from "./pages/Detailed/MotorCoachPage";
+import WagonPage from "./pages/Detailed/WagonPage";
 
-const { Header, Content, Footer } = Layout;
-const { Search } = Input;
+const { Content, Footer } = Layout;
 
 function App() {
-  const navigate = useNavigate();
   const ctx = useContext(AuthContext);
-  const menuPressed = (item: any) => {
-    if (item.key === "Logout") {
-      ctx.logout();
-      navigate("/");
-    } else {
-      navigate(item.key);
-    }
-  };
   return (
     <Layout className="layout">
-      <Header
-        style={{
-          zIndex: 1,
-          width: "100%",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          padding: "1em",
-        }}
-      >
-        <Search
-          placeholder="Search trains ..."
-          style={{ width: "25%" }}
-          onSearch={(data) => {
-            navigate("/search/" + data, { replace: true });
-          }}
-        />
-        {ctx.user ? (
-          <Dropdown overlay={<Menu onClick={menuPressed} items={items} />}>
-            <Button type="link" onClick={(e) => e.preventDefault()}>
-              <UserOutlined
-                style={{
-                  fontSize: "1.5em",
-                  marginRight: "0.5em",
-                  color: "#fff",
-                }}
-              />
-            </Button>
-          </Dropdown>
-        ) : (
-          loginMenu
-        )}
-      </Header>
+      <NavBar />
       <Content
         style={{
           padding: "1.5em",
@@ -81,13 +41,23 @@ function App() {
 
           <Route
             path="/login"
-            element={<ProtectedRoute isAuth={!ctx.user} element={<Login />} redirect="/" />}
+            element={
+              <ProtectedRoute
+                isAuth={!ctx.user}
+                element={<Login />}
+                redirect="/"
+              />
+            }
           />
 
           <Route
             path="/register"
             element={
-              <ProtectedRoute isAuth={!ctx.user} element={<Register />}  redirect="/"/>
+              <ProtectedRoute
+                isAuth={!ctx.user}
+                element={<Register />}
+                redirect="/"
+              />
             }
           />
 
@@ -99,7 +69,9 @@ function App() {
           />
           <Route path="/search/:query" element={<SearchPage />} />
 
-          <Route path="/:type/:id" element={<TrainPage />} />
+          <Route path="/locomotive/:id" element={<LocomotivePage />} />
+          <Route path="/motor-coach/:id" element={<MotorCoachPage />} />
+          <Route path="/wagon/:id" element={<WagonPage />} />
           <Route path="/manufacturer/:id" element={<Manufacturer />} />
           <Route path="/operator/:id" element={<Operator />} />
 
@@ -116,44 +88,5 @@ function App() {
     </Layout>
   );
 }
-
-const items = [
-  {
-    label: "API management",
-    key: "/api/management",
-    icon: <ApiOutlined />,
-  },
-  {
-    label: "Settings",
-    key: "/settings",
-    icon: <SettingOutlined />,
-  },
-  {
-    label: "Account",
-    key: "/account",
-    icon: <UserOutlined />,
-  },
-  {
-    label: "Logout",
-    key: "Logout",
-    icon: <ApiOutlined />,
-  },
-];
-
-const loginMenu = (
-  <div>
-    <NavLink
-      to="/login"
-      style={{
-        marginRight: "0.5em",
-      }}
-    >
-      <Button type="primary">Login</Button>
-    </NavLink>
-    <NavLink to="/register">
-      <Button type="primary">Register</Button>
-    </NavLink>
-  </div>
-);
 
 export default App;
